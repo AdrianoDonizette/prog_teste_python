@@ -1,38 +1,28 @@
-from selenium import webdriver
-import time
-
-navegador: webdriver = webdriver.Chrome("chromedriver.exe")
-
-#passo 1: entra no site do instagram
-navegador.get("https://instagram.com/")
-time.sleep(2)
-
-#passo 2: faz login
-navegador.find_element_by_xpath('//*[@id="loginForm"]/div/div[1]/div/label/input').send_keys("AdrianoTestBotPython")
-navegador.find_element_by_xpath('//*[@id="loginForm"]/div/div[2]/div/label/input').send_keys("adF489300")
-time.sleep(0.5)
-navegador.find_element_by_xpath('//*[@id="loginForm"]/div/div[3]/button/div').click()
-time.sleep(3)
-
-#passo 3: clica no "agora não" do "salvar informações de login"
-navegador.find_element_by_xpath('//*[@id="react-root"]/section/main/div/div/div/div/button').click()
-time.sleep(2)
-
-#passo 4: clica no "agora não" do "salvar notificação"
-navegador.find_element_by_xpath('/html/body/div[5]/div/div/div/div[3]/button[2]').click()
-time.sleep(1)
-
-#passo 5: clica na barra de pesquisa para procurar o perfil
-navegador.find_element_by_xpath('/html/body/div[1]/section/nav/div[2]/div/div/div[2]/input').click()
+import pandas as pd
+from twilio.rest import Client
 
 
-#passo 6: digita o nome do perfil na barra de pesquisa
-navegador.find_element_by_xpath('//*[@id="react-root"]/section/nav/div[2]/div/div/div[2]/input').send_keys("VihSantos")
-time.sleep(1)
+account_sid ='ACb161f6ba6a89e8b15d5b7175fbc79f74'
+auth_token = '534113a4919b09df67d17a149bee67cc'
+client = Client(account_sid,auth_token)
 
-#passo 7: clica no perfil pesquisado
-navegador.find_element_by_class_name("-qQT3").click()
-time.sleep(3)
+lista_meses = ['janeiro','fevereiro','março','abril', 'maio','junho']
 
-#passo 8: clica para seguir o perfil pesquisado
-navegador.find_element_by_xpath('//*[@id="react-root"]/section/main/div/header/section/div[1]/div[2]/div/div/div/span/span[1]/button').click()
+for mes in lista_meses:
+    tabela_vendas = pd.read_excel(f'{mes}.xlsx')
+    if(tabela_vendas['Vendas']>55000).any():
+        vendedor = tabela_vendas.loc[tabela_vendas['Vendas']>55000,'Vendedor'].values[0]
+        vendas = tabela_vendas.loc[tabela_vendas['Vendas']>55000,'Vendas'].values[0]
+        print(f'No mês {mes} alguém bateu a meta. Vendedor: {vendedor}, Vendas:{vendas} ')
+
+
+
+
+message = client.messages.create(
+     to ="+5521980809924",
+    from_="+19704401546",
+    body = f'No mês {mes} alguém bateu a meta. Vendedor: {vendedor}, Vendas:{vendas}')
+print(message.sid)
+
+
+
